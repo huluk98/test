@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #chat-container {
+            width: 80%;
+            height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: white;
+            overflow-y: scroll;
+            margin-top: 20px;
+        }
+
+        #input-container {
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        #userInput {
+            flex-grow: 1;  /* to take remaining space */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-right: 10px;  /* to create space between input and button */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .user-message {
+            color: blue;
+            margin: 5px;
+            padding: 5px;
+        }
+
+        .ai-message {
+            color: green;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">CSTUGPT</h2>
+
+<div id="chat-container"></div>
+
+<div id="input-container">
+    <input type="text" id="userInput" name="userInput">
+    <button id="sendButton" onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+function sendMessage() {
+    var input = document.getElementById("userInput").value;
+    if (input.trim() === '') return;  // Do not send empty messages
+
+    document.getElementById("chat-container").innerHTML += "<div class='user-message'>User: " + input + "</div>";
+    
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            document.getElementById("chat-container").innerHTML += "<div class='ai-message'>AI: " + response.AI + "</div>";
+        }
+    };
+    xhttp.open("POST", "http://CSTUGPT-env.eba-k3ywriti.ap-southeast-2.elasticbeanstalk.com/chatbot", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify({"message": input}));
+
+    document.getElementById("userInput").value = "";  // clear input field
+}
+
+// Add event listener for "Enter" key
+document.getElementById("userInput").addEventListener("keyup", function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        document.getElementById("sendButton").click();
+    }
+});
+</script>
+
+</body>
+</html>
